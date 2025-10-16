@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './app/auth/auth.module';
+import { BankSoalModule } from './app/bank-soal/bank-soal.module';
+import { UjianModule } from './app/ujian/ujian.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { AuthModule } from './app/auth/auth.module';
       },
     }),
     AuthModule,
+    BankSoalModule,
+    UjianModule,
   ],
   controllers: [AppController],
   providers: [AppService],

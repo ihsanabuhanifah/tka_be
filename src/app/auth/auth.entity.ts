@@ -1,4 +1,11 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column } from "typeorm";
+import {
+  Entity,
+  BaseEntity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+} from 'typeorm';
+import { Ujian } from '../ujian/ujian.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -22,10 +29,12 @@ export class User extends BaseEntity {
 
   @Column({ nullable: true })
   role: string;
+  @OneToMany(() => Ujian, (ujian) => ujian.user)
+  ujians: Ujian[];
 
-  @Column({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
+  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
-  @Column({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
+  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   updated_at: Date;
 }
