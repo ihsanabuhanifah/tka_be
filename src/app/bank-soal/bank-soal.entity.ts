@@ -35,7 +35,7 @@ export class BankSoal extends BaseEntity {
   soal: string;
   
 
-  @Column({  nullable: true })
+  @Column({  nullable: true, type:"text" })
   pembahasan: string;
 
   @Column({ nullable: true })
