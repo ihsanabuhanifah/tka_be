@@ -33,6 +33,24 @@ export class BankSoal extends BaseEntity {
 
   @Column({ type: 'text' })
   soal: string;
+  
+
+  @Column({  nullable: true })
+  pembahasan: string;
+
+  @Column({ nullable: true })
+  tingkat_kesulitan: string;
+
+  @Column()
+  is_public: number;
+
+  @Column({ nullable: true })
+  nama_guru: string;
+
+  
+
+  @Column({ nullable: true })
+  tingkat_sekolah: string;
   // Disimpan sebagai JSON string (pertanyaan + pilihan)
 
   @Column({ type: 'text', nullable: true })
@@ -44,8 +62,7 @@ export class BankSoal extends BaseEntity {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToMany(() => Ujian, (ujian) => ujian.soal)
-  ujians: Ujian[];
+ 
 
   @CreateDateColumn({ type: 'datetime' })
   created_at: Date;

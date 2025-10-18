@@ -1,27 +1,32 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Like, Repository } from 'typeorm';
 import { BankSoal } from './bank-soal.entity';
 import { Mapel } from './mapel.entity';
 import { User } from '../auth/auth.entity';
+import { UjianService } from '../ujian/ujian.service';
 
 @Injectable()
 export class BankSoalService {
   constructor(
     @InjectRepository(BankSoal)
     private readonly bankSoalRepo: Repository<BankSoal>,
+
+    private readonly ujianService: UjianService,
   ) {}
 
   async createOne(data: any, userId: number): Promise<any> {
-    const { mapel_id, materi, point, tipe, soal, jawaban } = data;
+    const { jawaban, soal } = data;
 
     // const mapel = await this.mapelRepo.findOne({ where: { id: mapel_id } });
     delete data.id;
 
+    console.log('Data', data);
+
     const save = await this.bankSoalRepo.save({
       ...data,
-      mapel : {
-        id : 1
+      mapel: {
+        id: data.mapel_id,
       },
       jawaban: jawaban ? JSON.stringify(jawaban) : null,
       soal: soal ? JSON.stringify(soal) : null,
@@ -29,48 +34,104 @@ export class BankSoalService {
         id: userId,
       },
     });
+
+    this.ujianService.updateBycreateSoal(data.ujian_id, [
+      ...data.banksoal,
+      save.id,
+    ]);
     return {
       status: `Success `,
-      message: 'Buku berhasil di update',
+      data: {
+        id: save.id,
+        mapel_id: save.mapel.id,
+        jawaban: save.jawaban,
+        materi: save.materi,
+        point: save.point,
+        created_at: save.created_at,
+        tipe: save.tipe,
+        soal: save.soal,
+        ujian_id: save.ujian_id,
+        pembahasan: save.pembahasan,
+        tingkat_kesulitan: save.tingkat_kesulitan,
+        tingkat_sekolah: save.tingkat_sekolah,
+        is_public: save.is_public,
+      },
+    };
+  }
+
+  async updateOne(data: any, userId: number): Promise<any> {
+    const { mapel_id, materi, point, tipe, banksoal, jawaban, soal } = data;
+
+    const save = await this.bankSoalRepo.save({
+      ...data,
+      mapel: {
+        id: data.mapel_id,
+      },
+      jawaban: jawaban ? JSON.stringify(jawaban) : null,
+      soal: soal ? JSON.stringify(soal) : null,
+      // user: {
+      //   id: userId,
+      // },
+    });
+
+    return {
+      status: `Success `,
       data: save,
     };
   }
 
-  //   async createMany(dataArray: any[], userId: number) {
-  //     if (!Array.isArray(dataArray) || dataArray.length === 0)
-  //       throw new BadRequestException("Data soal tidak valid");
+  async findAll(query: any) {
+    const {
+      page = 1,
+      limit = 10,
+      mapel_id,
+      tipe,
+      tingkat_kesulitan,
+      tingkat_sekolah,
+      is_public,
+      keyword,
+    } = query;
 
-  //     const user = await this.userRepo.findOne({ where: { id: userId } });
-  //     if (!user) throw new BadRequestException("User tidak ditemukan");
+    const take = Number(limit);
+    const skip = (Number(page) - 1) * take;
 
-  //     const soals: BankSoal[] = [];
+    // 🔍 Filter dinamis
+    const where: FindOptionsWhere<BankSoal> = {};
 
-  //     for (const data of dataArray) {
-  //       const mapel = await this.mapelRepo.findOne({
-  //         where: { id: data.mapel_id },
-  //       });
-  //       if (!mapel)
-  //         throw new BadRequestException(`Mapel ID ${data.mapel_id} tidak ditemukan`);
+    where.mapel = { id: mapel_id };
 
-  //       const soal = this.bankSoalRepo.create({
-  //         materi: data.materi,
-  //         mapel,
-  //         point: data.point,
-  //         tipe: data.tipe,
-  //         soal: JSON.stringify(data.soal),
-  //         jawaban: data.jawaban ? JSON.stringify(data.jawaban) : null,
-  //         user,
-  //       });
-  //       soals.push(soal);
-  //     }
+    if (tipe) {
+      where.tipe = tipe;
+    }
 
-  //     return this.bankSoalRepo.save(soals);
-  //   }
+    if (tingkat_kesulitan) {
+      where.tingkat_kesulitan = tingkat_kesulitan;
+    }
 
-  async findAll() {
-    return this.bankSoalRepo.find({
-      relations: ['mapel', 'user'],
+    if (tingkat_sekolah) {
+      where.tingkat_sekolah = tingkat_sekolah;
+    }
+
+    // 🔍 Pencarian kata kunci di "materi" atau "soal"
+    if (keyword) {
+      where.materi = Like(`%${keyword}%`);
+    }
+
+    const [data, total] = await this.bankSoalRepo.findAndCount({
+      where,
+      // relations: ['mapel', 'user'],
       order: { created_at: 'DESC' },
+      take,
+      skip,
     });
+
+    return {
+      status: 'Success',
+      page: Number(page),
+      limit: Number(limit),
+      total,
+      total_page: Math.ceil(total / take),
+      data,
+    };
   }
 }

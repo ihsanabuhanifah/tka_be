@@ -23,8 +23,8 @@ export class Mapel extends BaseEntity {
 
   @OneToMany(() => BankSoal, (bankSoal) => bankSoal.mapel)
   bankSoal: BankSoal[];
-  @OneToMany(() => Ujian, (ujian) => ujian.mapel)
-  ujians: Ujian[];
+//   @OneToMany(() => Ujian, (ujian) => ujian.mapel)
+//   ujians: Ujian[];
 
   @CreateDateColumn({ type: 'datetime' })
   created_at: Date;

@@ -14,17 +14,27 @@ import { BankSoal } from '../bank-soal/bank-soal.entity';
 
 @Entity('ujian')
 export class Ujian {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ nullable: false })
   nama_ujian: string;
 
   @Column({ type: 'text', nullable: true })
   deskripsi: string;
+  @Column({ nullable: true })
+  is_acak: boolean;
+  @Column({ nullable: true })
+  jumlah_soal: number;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ nullable: true })
   kode: string;
+  @Column({ nullable: true })
+  user_name: string;
+  @Column({ nullable: true })
+  nama_mapel: string;
+  @Column({ nullable: true })
+  mapel_id: string;
 
   @Column({ type: 'datetime', nullable: false })
   tanggal_mulai: Date;
@@ -39,21 +49,15 @@ export class Ujian {
   is_published: boolean;
 
   // relasi ke mapel
-  @ManyToOne(() => Mapel, (mapel) => mapel.ujians, { onDelete: 'CASCADE' })
-  mapel: Mapel;
+  //   @ManyToOne(() => Mapel, (mapel) => mapel.ujians, { onDelete: 'CASCADE' })
+  //   mapel: Mapel;
 
   // relasi ke user (pembuat ujian)
   @ManyToOne(() => User, (user) => user.ujians, { onDelete: 'CASCADE' })
   user: User;
 
-  // relasi ke bank soal
-  @ManyToMany(() => BankSoal, { cascade: true })
-  @JoinTable({
-    name: 'ujian_soal', // tabel pivot untuk ujian-soal
-    joinColumn: { name: 'ujian_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'bank_soal_id', referencedColumnName: 'id' },
-  })
-  soal: BankSoal[];
+  @Column({type: "text", nullable : true})
+  soal: string;
 
   @CreateDateColumn()
   created_at: Date;

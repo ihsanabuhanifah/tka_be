@@ -6,39 +6,35 @@ import {
   Req,
   Get,
   BadRequestException,
-} from "@nestjs/common";
-import { JwtGuard } from "../auth/auth.guard";
-import { BankSoalService } from "./bank-soal.service";
+  Put,
+  Param,
+  Query,
+} from '@nestjs/common';
+import { JwtGuard } from '../auth/auth.guard';
+import { BankSoalService } from './bank-soal.service';
 
 @UseGuards(JwtGuard)
-@Controller("bank-soal")
+@Controller('bank-soal')
 export class BankSoalController {
   constructor(private readonly bankSoalService: BankSoalService) {}
 
   // 🟢 Simpan satu soal
-  @Post("create")
+  @Post('create')
   async createOne(@Body() body: any, @Req() req) {
     const userId = req.user?.id;
-    if (!userId) throw new BadRequestException("User tidak ditemukan");
+    if (!userId) throw new BadRequestException('User tidak ditemukan');
 
     return this.bankSoalService.createOne(body, userId);
   }
 
-  // 🟢 Simpan banyak soal sekaligus
-//   @Post("create-many")
-//   async createMany(@Body() body: any, @Req() req) {
-//     const userId = req.user?.id;
-//     if (!userId) throw new BadRequestException("User tidak ditemukan");
+  @Put('update')
+  async updateOne(@Body() body: any, @Req() req) {
+    const userId = req.user?.id;
 
-//     if (!Array.isArray(body))
-//       throw new BadRequestException("Data harus berupa array");
-
-//     return this.bankSoalService.createMany(body, userId);
-//   }
-
-  // 🟢 Lihat semua soal
-  @Get()
-  async findAll() {
-    return this.bankSoalService.findAll();
+    return this.bankSoalService.updateOne(body, userId);
   }
+  @Get("list")
+async findAll(@Query() query: any) {
+  return this.bankSoalService.findAll(query);
+}
 }

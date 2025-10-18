@@ -4,9 +4,10 @@ import { BankSoalController } from './bank-soal.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Mapel } from './mapel.entity';
 import { BankSoal } from './bank-soal.entity';
+import { UjianModule } from '../ujian/ujian.module';
 
 @Module({
-   imports: [TypeOrmModule.forFeature([Mapel, BankSoal])], 
+   imports: [TypeOrmModule.forFeature([Mapel, BankSoal]), UjianModule], 
   providers: [BankSoalService],
   controllers: [BankSoalController]
 })
